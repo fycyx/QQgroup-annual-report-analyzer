@@ -19,8 +19,8 @@
 ### 1. 克隆项目
 
 ```bash
-git clone https://github.com/ZiHuixi/qqgroup-yearreport-analyzer.git
-cd qqgroup-yearreport-analyzer
+git clone https://github.com/ZiHuixi/QQgroup-annual-report-analyzer.git
+cd QQgroup-annual-report-analyzer
 ```
 ### 2. 安装依赖
 ```bash
@@ -139,7 +139,7 @@ OPENAI_MODEL = "gpt-4o-mini"
 ## 🛠️ 项目结构
 
 ```
-qqgroup-yearreport-analyzer/
+QQgroup-annual-report-analyzer/
 ├── main.py              # 主入口
 ├── analyzer.py          # 核心分析器
 ├── report_generator.py  # 文本报告生成

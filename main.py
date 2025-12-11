@@ -4,7 +4,7 @@
 QQ群聊年度报告生成器 - 主入口
 
 Author: Claude Opus 4.5 & Huixi
-GitHub: https://github.com/ZiHuixi/qqgroup-yearreport-analyzer
+GitHub: https://github.com/ZiHuixi/QQgroup-annual-report-analyzer
 License: MIT
 
 Usage:
