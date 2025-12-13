@@ -27,7 +27,50 @@ install_dependencies() {
         sudo apt update || echo "⚠️ apt update 失败，继续尝试安装"
         sudo apt install -y python3 python3-pip python3-venv nodejs npm nginx certbot python3-certbot-nginx git redis-server mysql-server || echo "⚠️ 部分软件包安装失败，请检查"
     elif [[ "$OS" == "centos" ]] || [[ "$OS" == "rhel" ]]; then
-        sudo yum install -y python3 python3-pip nodejs npm nginx certbot python3-certbot-nginx git redis mysql-server || echo "⚠️ 部分软件包安装失败，请检查"
+        echo "🔧 配置国内镜像源..."
+        
+        # 备份原有 repo 文件
+        sudo mkdir -p /etc/yum.repos.d/backup
+        sudo mv /etc/yum.repos.d/*.repo /etc/yum.repos.d/backup/ 2>/dev/null || true
+        
+        # 根据 CentOS 版本选择合适的镜像源
+        if [[ "$VER" == "8"* ]]; then
+            echo "📦 配置 CentOS 8 阿里云镜像源"
+            sudo curl -o /etc/yum.repos.d/CentOS-Base.repo https://mirrors.aliyun.com/repo/Centos-vault-8.5.2111.repo
+            sudo sed -i -e '/mirrors.cloud.aliyuncs.com/d' -e '/mirrors.aliyuncs.com/d' /etc/yum.repos.d/CentOS-Base.repo
+        elif [[ "$VER" == "9"* ]]; then
+            echo "📦 配置 CentOS 9 阿里云镜像源"
+            sudo curl -o /etc/yum.repos.d/CentOS-Base.repo https://mirrors.aliyun.com/repo/Centos-vault-9.stream.repo
+            sudo sed -i -e '/mirrors.cloud.aliyuncs.com/d' -e '/mirrors.aliyuncs.com/d' /etc/yum.repos.d/CentOS-Base.repo
+        else
+            echo "⚠️ 未识别的 CentOS 版本: $VER，使用默认源"
+            sudo mv /etc/yum.repos.d/backup/*.repo /etc/yum.repos.d/ 2>/dev/null || true
+        fi
+        
+        # 安装 EPEL 源（使用阿里云镜像）
+        sudo yum install -y https://mirrors.aliyun.com/epel/epel-release-latest-$(rpm -E %rhel).noarch.rpm || sudo yum install -y epel-release
+        
+        sudo yum clean all
+        sudo yum makecache
+        
+        echo "📦 安装系统依赖包..."
+        sudo yum install -y python3 python3-pip git redis mysql-server || echo "⚠️ 部分软件包安装失败，请检查"
+        
+        # 安装 Node.js（使用淘宝镜像）
+        if ! command -v node >/dev/null 2>&1; then
+            echo "📦 安装 Node.js..."
+            curl -fsSL https://npmmirror.com/mirrors/node/latest-v18.x/node-v18.19.0-linux-x64.tar.xz -o /tmp/node.tar.xz
+            sudo tar -xf /tmp/node.tar.xz -C /usr/local/
+            sudo ln -sf /usr/local/node-v18.19.0-linux-x64/bin/node /usr/bin/node
+            sudo ln -sf /usr/local/node-v18.19.0-linux-x64/bin/npm /usr/bin/npm
+            rm -f /tmp/node.tar.xz
+        fi
+        
+        # 安装 Nginx
+        sudo yum install -y nginx || echo "⚠️ Nginx 安装失败"
+        
+        # 安装 Certbot
+        sudo yum install -y certbot python3-certbot-nginx || echo "⚠️ Certbot 安装失败，可稍后手动安装"
     else
         echo "⚠️ 不支持的操作系统: $OS"
         echo "请手动安装以下依赖: python3, python3-pip, python3-venv, nodejs, npm, nginx, certbot, git, redis, mysql"
@@ -41,6 +84,7 @@ install_dependencies() {
 }
 
 
+
 # 创建部署用户
 create_deploy_user() {
     echo ""
@@ -51,6 +95,15 @@ create_deploy_user() {
     else
         sudo useradd -m -s /bin/bash qqreport
         echo "✅ 已创建用户 qqreport"
+
+        # 给 qqreport 用户添加 sudo 权限
+        echo "🔧 给 qqreport 用户分配 sudo 权限"
+        if [[ "$OS" == "ubuntu" ]] || [[ "$OS" == "debian" ]]; then
+            sudo usermod -aG sudo qqreport
+        elif [[ "$OS" == "centos" ]] || [[ "$OS" == "rhel" ]]; then
+            sudo usermod -aG wheel qqreport
+        fi
+        echo "✅ qqreport 用户已配置 sudo 权限"
     fi
 }
 
@@ -86,10 +139,18 @@ setup_python_env() {
         sudo -u qqreport python3 -m venv venv
     fi
     
-    sudo -u qqreport venv/bin/pip install --upgrade pip
-    sudo -u qqreport venv/bin/pip install -r backend/requirements.txt
+    echo "🔧 配置 pip 使用国内镜像源..."
+    sudo -u qqreport venv/bin/pip install --upgrade pip -i https://pypi.tuna.tsinghua.edu.cn/simple
+    sudo -u qqreport venv/bin/pip install -r backend/requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple
+    
+    echo "📦 安装 Playwright 浏览器依赖..."
+    if [[ "$OS" == "centos" ]] || [[ "$OS" == "rhel" ]]; then
+        sudo yum install -y libX11 libXcomposite libXcursor libXdamage libXext libXi libXrandr libXrender libXtst cups-libs pango alsa-lib atk at-spi2-atk gtk3 || echo "⚠️ Playwright 依赖包安装失败，请手动检查"
+    fi
+    
     sudo -u qqreport venv/bin/playwright install chromium
-    sudo -u qqreport venv/bin/playwright install-deps
+    # 跳过 playwright install-deps
+    # sudo -u qqreport venv/bin/playwright install-deps
     
     echo "✅ Python 环境配置完成"
 }
