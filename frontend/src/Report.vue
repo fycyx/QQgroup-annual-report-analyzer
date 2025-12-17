@@ -40,22 +40,6 @@
       </div>
       <button @click="loadReport">重新加载</button>
     </div>
-    
-    <!-- 版权信息 -->
-    <footer v-if="!isShareMode" class="copyright-footer">
-      <div class="copyright-content">
-        <p>
-          <span>© 2025 QQ群年度报告分析器</span>
-          <span class="separator">|</span>
-          <span>作者：<a href="https://github.com/ZiHuixi" target="_blank">Huixi</a> & <a href="https://github.com/yujingkun1" target="_blank">Jingkun</a></span>
-          <span class="separator">|</span>
-          <span>开源协议：<a href="https://www.gnu.org/licenses/agpl-3.0.html" target="_blank">AGPL-3.0</a></span>
-        </p>
-        <p class="copyright-warning">
-          ⚠️ 本软件为开源软件，<strong>严禁用于任何商业用途</strong>。仅供个人学习、研究和非商业用途使用。
-        </p>
-      </div>
-    </footer>
   </div>
 </template>
 
@@ -80,11 +64,6 @@ const currentReportId = ref('')
 const generatingImage = ref(false)
 const imageUrl = ref('')
 const imageError = ref('')
-
-// ========== 显示模式状态 ==========
-// 当 URL 上带有 ?mode=share 时，表示用于图片生成的分享模式，此时不显示页面底部的版权警告栏，
-// 避免截图时被截入图片导致布局异常
-const isShareMode = ref(false)
 
 // ========== 路由参数解析 ==========
 /**
@@ -240,11 +219,6 @@ const generateImage = async () => {
 onMounted(async () => {
   const params = getRouteParams()
 
-  // 检查当前是否为分享模式（用于生成图片的专用模式）
-  const search = window.location.search || ''
-  const qs = new URLSearchParams(search)
-  isShareMode.value = (qs.get('mode') === 'share')
-
   if (params) {
     currentTemplateId.value = params.templateId
     currentReportId.value = params.reportId
@@ -372,56 +346,4 @@ onMounted(async () => {
   transform: translateY(0);
 }
 
-/* 版权信息样式 */
-.copyright-footer {
-  margin-top: 30px;
-  padding: 12px 20px;
-  background: #f5f5f7;
-  border-top: 1px solid #e5e5e7;
-  text-align: center;
-}
-
-.copyright-content {
-  max-width: 1200px;
-  margin: 0 auto;
-}
-
-.copyright-content p {
-  margin: 3px 0;
-  font-size: 10px;
-  color: #6e6e73;
-  line-height: 1.4;
-}
-
-.copyright-content a {
-  color: #007aff;
-  text-decoration: none;
-  transition: color 0.2s;
-}
-
-.copyright-content a:hover {
-  color: #0051d5;
-  text-decoration: underline;
-}
-
-.separator {
-  margin: 0 6px;
-  color: #d2d2d7;
-}
-
-.copyright-warning {
-  margin-top: 6px !important;
-  padding: 4px 10px;
-  background: #fff3cd;
-  border-left: 2px solid #ffc107;
-  border-radius: 4px;
-  color: #856404;
-  font-size: 9px;
-  display: inline-block;
-}
-
-.copyright-warning strong {
-  color: #d32f2f;
-  font-weight: 600;
-}
 </style>
