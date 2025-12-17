@@ -26,6 +26,7 @@ if exist "backend\.env" (
   for /f "tokens=1,2 delims==" %%A in ('findstr /R /C:"^FLASK_PORT=" "backend\.env"') do (
     if /I "%%A"=="FLASK_PORT" (
       set "HEALTH_PORT=%%B"
+      set "HEALTH_PORT=%HEALTH_PORT: =%"
     )
   )
 )
@@ -191,12 +192,21 @@ if errorlevel 1 (
 
 echo ✅ Python 依赖安装并验证完成
 
-::: 安装Playwright浏览器（确保在虚拟环境中）
+:::: 安装Playwright浏览器（确保在虚拟环境中）
 echo.
 echo [6/9] 检查Playwright浏览器...
+
+REM 1）先确认 playwright 包本身是否已安装（在 venv 中）
+"%VENV_PYTHON%" -m pip show playwright >nul 2>&1
+if errorlevel 1 (
+    echo - 检测到虚拟环境中未安装 playwright，正在安装模块...
+    "%VENV_PYTHON%" -m pip install playwright
+)
+
+REM 2）再检查是否已经可以正常启动浏览器
 "%VENV_PYTHON%" -c "from playwright.sync_api import sync_playwright; p = sync_playwright().start(); p.chromium.launch(headless=True); p.stop()" >nul 2>&1
 if errorlevel 1 (
-    echo ⚠️  Playwright浏览器未安装，正在安装...
+    echo ⚠️  Playwright浏览器未安装，正在安装 Chromium 内核...
     echo    （首次运行需要下载约100MB，请耐心等待）
     echo    使用虚拟环境中的 Python：%VENV_PYTHON%
 
@@ -292,7 +302,7 @@ if %RETRY_COUNT% gtr %MAX_RETRIES% (
     exit /b 1
 )
 
-powershell -Command "try { $response = Invoke-WebRequest -Uri 'http://localhost:%HEALTH_PORT%/api/health' -UseBasicParsing -TimeoutSec 2 -ErrorAction Stop; exit 0 } catch { exit 1 }" >nul 2>&1
+"%VENV_PYTHON%" -c "import sys,urllib.request; urllib.request.urlopen('http://127.0.0.1:%HEALTH_PORT%/api/health', timeout=2); sys.exit(0)" >nul 2>&1
 if errorlevel 1 (
     timeout /t 1 /nobreak >nul
     goto wait_backend
@@ -312,7 +322,7 @@ echo ========================================
 echo 🎉 启动完成！
 echo ========================================
 echo 📱 前端访问地址：http://localhost:5173
-echo 🔧 后端API地址：http://localhost:5000
+echo 🔧 后端API地址：http://localhost:%HEALTH_PORT%
 echo.
 echo 💡 使用提示：
 echo    - 两个服务窗口将保持打开状态
