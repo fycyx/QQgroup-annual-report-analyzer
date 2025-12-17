@@ -363,8 +363,8 @@ onMounted(async () => {
 
 /* 版权信息样式 */
 .copyright-footer {
-  margin-top: 40px;
-  padding: 20px;
+  margin-top: 30px;
+  padding: 12px 20px;
   background: #f5f5f7;
   border-top: 1px solid #e5e5e7;
   text-align: center;
@@ -376,10 +376,10 @@ onMounted(async () => {
 }
 
 .copyright-content p {
-  margin: 8px 0;
-  font-size: 12px;
+  margin: 3px 0;
+  font-size: 10px;
   color: #6e6e73;
-  line-height: 1.6;
+  line-height: 1.4;
 }
 
 .copyright-content a {
@@ -394,18 +394,19 @@ onMounted(async () => {
 }
 
 .separator {
-  margin: 0 10px;
+  margin: 0 6px;
   color: #d2d2d7;
 }
 
 .copyright-warning {
-  margin-top: 10px !important;
-  padding: 10px 16px;
+  margin-top: 6px !important;
+  padding: 4px 10px;
   background: #fff3cd;
-  border-left: 3px solid #ffc107;
-  border-radius: 6px;
+  border-left: 2px solid #ffc107;
+  border-radius: 4px;
   color: #856404;
-  font-size: 11px;
+  font-size: 9px;
+  display: inline-block;
 }
 
 .copyright-warning strong {

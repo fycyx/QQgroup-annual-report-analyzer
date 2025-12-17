@@ -1899,8 +1899,8 @@ button.danger:hover:not(:disabled) {
 
 /* 版权信息样式 */
 .copyright-footer {
-  margin-top: 60px;
-  padding: 30px 20px;
+  margin-top: 40px;
+  padding: 16px 20px;
   background: #f5f5f7;
   border-top: 1px solid #e5e5e7;
   text-align: center;
@@ -1912,10 +1912,10 @@ button.danger:hover:not(:disabled) {
 }
 
 .copyright-content p {
-  margin: 8px 0;
-  font-size: 13px;
+  margin: 4px 0;
+  font-size: 11px;
   color: #6e6e73;
-  line-height: 1.6;
+  line-height: 1.5;
 }
 
 .copyright-content a {
@@ -1930,18 +1930,19 @@ button.danger:hover:not(:disabled) {
 }
 
 .separator {
-  margin: 0 12px;
+  margin: 0 8px;
   color: #d2d2d7;
 }
 
 .copyright-warning {
-  margin-top: 12px !important;
-  padding: 12px 20px;
+  margin-top: 8px !important;
+  padding: 6px 12px;
   background: #fff3cd;
-  border-left: 3px solid #ffc107;
-  border-radius: 6px;
+  border-left: 2px solid #ffc107;
+  border-radius: 4px;
   color: #856404;
-  font-size: 12px;
+  font-size: 10px;
+  display: inline-block;
 }
 
 .copyright-warning strong {
@@ -1950,17 +1951,18 @@ button.danger:hover:not(:disabled) {
 }
 
 .copyright-links {
-  margin-top: 12px !important;
+  margin-top: 6px !important;
 }
 
 .copyright-links a {
   display: inline-block;
-  margin: 0 8px;
-  padding: 6px 12px;
+  margin: 0 4px;
+  padding: 4px 8px;
   background: white;
   border: 1px solid #d2d2d7;
-  border-radius: 6px;
+  border-radius: 4px;
   transition: all 0.2s;
+  font-size: 10px;
 }
 
 .copyright-links a:hover {
