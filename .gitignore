@@ -64,6 +64,8 @@ Thumbs.db
 # 临时文件
 *.tmp
 *.temp
+*.zip
+*.tar.gz
 
 # 启动脚本生成的文件
 .backend.pid
